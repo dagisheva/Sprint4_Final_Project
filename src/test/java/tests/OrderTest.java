@@ -1,68 +1,38 @@
 package tests;
 
-import POM.HomePageSamokat;
-import POM.OrderFirstPage;
-import POM.OrderSecondPage;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.After;
+import helpers.TestData;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import pom.HomePageSamokat;
+import pom.OrderFirstPage;
+import pom.OrderSecondPage;
 
-import static constants.TestDataOrderTest.*;
-
-public class OrderTest {
-    private WebDriver driver;
-
-    @Before
-    public void startUp() {
-        WebDriverManager.firefoxdriver().setup();
-        driver = new FirefoxDriver();
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-    }
+public class OrderTest extends BaseTest {
+    private final String firstName = TestData.generateFirstName();
+    private final String lastName = TestData.generateLastName();
+    private final String address = TestData.generateAddress();
+    private final String phoneNumber = TestData.generatePhoneNumber();
+    private final String strDate = TestData.generateDate();
+    private final String daysNumber = TestData.chooseDaysNumber();
 
     @Test
     public void placeOrderTest() {
-        HomePageSamokat homePage = new HomePageSamokat(driver);
+        HomePageSamokat homePage = new HomePageSamokat(webDriver);
         homePage.clickCookieButton();
         homePage.clicUpperOrderButton();
-        OrderFirstPage oFPage = new OrderFirstPage(driver);
-        oFPage.fillOrderFormAndCheck(NAME, SURNAME, ADDRESS, PHONENUMBER);
+        OrderFirstPage oFPage = new OrderFirstPage(webDriver);
+        oFPage.fillFirstFormAndContinue(firstName, lastName, address, phoneNumber);
+        OrderSecondPage oSPage = new OrderSecondPage(webDriver);
+        oSPage.fillSecondFormAndConfirmOrder(strDate, daysNumber);
 
-        Assert.assertTrue("Имя должно совпадать с введённым",
-                oFPage.checkNameFieldEqualsExpected(NAME));
-        Assert.assertTrue("Фамилия должна совпадать с введённой",
-                oFPage.checkSurnameFieldEqualsExpected(SURNAME));
-        Assert.assertTrue("Адрес должен совпадать с введённым",
-                oFPage.checkAddressFieldEqualsExpected(ADDRESS));
-        Assert.assertTrue("Поле Станция метро не должно быть пустым",
-                oFPage.checkMetroFieldIsNotEmpty());
-        Assert.assertTrue("Номер телефона должен совпадать с введённым",
-                oFPage.checkPhoneEqualsExpected(PHONENUMBER));
-
-        oFPage.clickContinueButton();
-
-        OrderSecondPage oSPage = new OrderSecondPage(driver);
-        oSPage.setData(RENTDATE, DAYSNUMBER);
-        Assert.assertTrue("Дата должна совпадать с выбранной",
-                oSPage.checkDateIsAsChosen(RENTDATEASDATE));
-        Assert.assertTrue("Количество дней должно совпадать с выбранным",
-                oSPage.checkDaysNumber(DAYSNUMBER));
-
-        oSPage.clickOrderButton();
+        Assert.assertTrue("Текст должен содержать фразу 'Заказ оформлен'",
+                oSPage.checkTextIsIasExpected("Заказ оформлен"));
     }
 
     @Test
     public void checkLowerOrderButton() {
-        HomePageSamokat homePage = new HomePageSamokat(driver);
+        HomePageSamokat homePage = new HomePageSamokat(webDriver);
         homePage.clickLowerOrderButton();
         homePage.waitForRentPage();
-    }
-
-    @After
-    public void tearDown() {
-        driver.quit();
     }
 }
