@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class BaseTest {
-    protected static WebDriver webDriver;
+    protected WebDriver webDriver;
 
     @Before
     public void startUp() {
